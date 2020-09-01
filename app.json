@@ -2,6 +2,6 @@
   "name": "fruit-radar-old-devices-proxy",
   "repository": "https://github.com/niccokunzmann/fruit-radar-old-devices-proxy.git",
   "buildpacks": [{
-    "url": "https://github.com/ryandotsmith/nginx-buildpack.git"
+    "url": "heroku-community/nginx"
   }]
 }
