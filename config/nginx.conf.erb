@@ -1,0 +1,64 @@
+daemon off;
+#Heroku dynos have at least 4 cores.
+worker_processes <%= ENV['NGINX_WORKERS'] || 4 %>;
+
+events {
+	use epoll;
+	accept_mutex on;
+	worker_connections 1024;
+}
+
+http {
+  gzip on;
+  gzip_comp_level 2;
+  gzip_min_length 512;
+
+	server_tokens off;
+
+	log_format l2met 'measure#nginx.service=$request_time request_id=$http_x_request_id';
+	access_log logs/nginx/access.log l2met;
+	error_log logs/nginx/error.log;
+
+	include mime.types;
+	default_type application/octet-stream;
+	sendfile on;
+
+	#Must read the body in 20 seconds.
+	client_body_timeout 20;
+
+  server {
+    server_name _;
+
+    listen   80;
+
+    #	access_log off;
+
+    # see this for the proxy: https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/
+    # why this is here https://github.com/niccokunzmann/mundraub-android/pull/113#discussion_r217230294
+    location /na-ovoce/api/ {
+      # use variables and a resolver, see https://stackoverflow.com/a/32846603
+      resolver 9.9.9.9 valid=30s;
+      set $upstream_na_ovoce test;
+      proxy_pass https://na-ovoce.cz/api/;
+    }
+    # see this for the proxy: https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/
+    # why this is here https://github.com/niccokunzmann/mundraub-android/pull/113#discussion_r217230294
+    location /fruitmap/api/ {
+      proxy_ssl_server_name on; # from https://stackoverflow.com/a/25330027
+      proxy_ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+      proxy_set_header Host www.fruitmap.org;
+      proxy_set_header User-Agent $http_user_agent;
+      proxy_pass https://www.fruitmap.org/;
+    }
+
+    # see this for the proxy: https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/
+    # why this is here https://github.com/niccokunzmann/mundraub-android/pull/113#discussion_r217230294
+    location /nominatim/ {
+      # use variables and a resolver, see https://stackoverflow.com/a/32846603
+      resolver 9.9.9.9 valid=30s;
+      set $upstream_nominatim test;
+      proxy_pass https://nominatim.openstreetmap.org/;
+    }
+  }
+
+}
