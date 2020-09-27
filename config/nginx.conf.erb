@@ -59,5 +59,9 @@ http {
       set $upstream_nominatim test;
       proxy_pass https://nominatim.openstreetmap.org/;
     }
+
+    location / {
+      return 301 https://github.com/niccokunzmann/fruit-radar-old-devices-proxy#readme
+    }
   }
 }
