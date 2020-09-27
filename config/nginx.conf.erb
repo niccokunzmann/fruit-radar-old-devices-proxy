@@ -29,7 +29,7 @@ http {
   server {
     server_name _;
 
-    listen   80;
+    listen   <%= ENV['PORT'] || 80 %>;
 
     #	access_log off;
 
