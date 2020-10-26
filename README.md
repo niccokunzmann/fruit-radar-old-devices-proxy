@@ -1,6 +1,7 @@
 # fruit-radar-old-devices-proxy
 
 Proxy for the fruit radar app to allow access for old devices.
+It runs at http://fruit-radar-old-devices-proxy.herokuapp.com
 
 # Deployment
 
